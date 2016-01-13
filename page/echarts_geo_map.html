@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>ECharts</title>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="height:400px"></div>
+<!-- ECharts单文件引入 -->
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript">
+	// 路径配置
+	require.config({
+		paths: {
+			echarts: 'http://echarts.baidu.com/build/dist'
+		}
+	});
+
+	// 使用
+	require(
+			[
+				'echarts',
+				'echarts/chart/map' // 使用柱状图就加载bar模块，按需加载
+			],
+			function (ec) {
+				// 基于准备好的dom，初始化echarts图表
+				var myChart = ec.init(document.getElementById('main'));
+
+				require('echarts/util/mapData/params').params.AH = {
+					getGeoJson: function (callback) {
+						$.getJSON('rawData/geoJson/an_hui_geo.json',function(data){
+							console.log(data);
+						});
+					}
+				}
+
+				/*echarts.util.mapData.params.params.beijing = {
+					getGeoJson: function (callback) {
+						$.getJSON('./beijing.json', function (data) {
+							// 压缩后的地图数据必须使用 decode 函数转换
+							callback(echarts.util.mapData.params.decode(data));
+						});
+					}
+				};*/
+
+				myChart.setOption({
+					series : [
+						{
+							name:'北京地图',
+							type:'map',
+							mapType: 'beijing'
+						}
+					]
+				});
+			}
+	);
+</script>
+</body>

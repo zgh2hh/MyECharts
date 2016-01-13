@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>行政区划</title>
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=54f32509cd6f09dd9005764f09c50799"></script>
+	<style>
+		#container {
+			width:1024px;
+			height: 600px;
+		}
+	</style>
+</head>
+<body>
+	<div id="container"></div>
+	<select id="subDistricts"></select>
+	<script type="text/javascript">
+		var map = new AMap.Map('container');
+		map.setZoom(10);
+		map.setCenter([116.39,39.9]);
+
+		// 各市
+		/*AMap.service('AMap.DistrictSearch',function(){//回调函数
+			//实例化DistrictSearch
+			var districtSearch = new AMap.DistrictSearch();
+			//TODO: 使用districtSearch对象调用行政区查询的功能
+			districtSearch.setLevel('country');
+			//调用查询方法
+			districtSearch.search('中国',function(status, result){
+				var subDistricts = result.districtList[0].districtList;
+				var select = document.getElementById('subDistricts');
+				for(var i = 0;i < subDistricts.length; i += 1){
+					var name = subDistricts[i].name;
+					var option = document.createElement('option');
+					option.value = option.innerText = name;
+					select.appendChild(option);
+				}
+				select.onchange = function(){map.setCity(this.value)};
+			});
+		});*/
+
+		// 各区县
+		/*AMap.service('AMap.DistrictSearch',function(){//回调函数
+			//实例化DistrictSearch
+			var districtSearch = new AMap.DistrictSearch({
+				subdistrict : 2,
+				 extensions: 'all'  //返回行政区边界坐标组等具体信息
+			 });
+			//TODO: 使用districtSearch对象调用行政区查询的功能
+			districtSearch.setLevel('city');
+			//调用查询方法
+			//在对象初始化之后进行
+			 districtSearch.search('芜湖市', function(status, result){
+				 var bounds = result.districtList[0].boundaries;
+				 var polygon = new AMap.Polygon({
+				 map: map,
+				 strokeWeight: 1,
+				 path: bounds,
+				 fillOpacity: 0.7,
+				 fillColor: '#CCF3FF',
+				 strokeColor: '#CC66CC'
+				 });
+				 map.setFitView();
+			 });
+		});*/
+
+		//加载云图层插件
+		AMap.service('AMap.DistrictSearch', function() {
+			var opts = {
+				subdistrict: 3,   //返回下一级行政区
+				extensions: 'all',  //返回行政区边界坐标组等具体信息
+				level: 'district'  //查询行政级别为 市
+			};
+
+			//实例化DistrictSearch
+			var district = new AMap.DistrictSearch(opts);
+			district.setLevel('district');
+			//行政区查询
+			district.search('芜湖市', function(status, result) {
+				var bounds = result.districtList[0].boundaries;
+				var polygons = [];
+				if (bounds) {
+					for (var i = 0, l = bounds.length; i < l; i++) {
+						//生成行政区划polygon
+						var polygon = new AMap.Polygon({
+							map: map,
+							strokeWeight: 1,
+							path: bounds[i],
+							fillOpacity: 0.7,
+							fillColor: '#CCF3FF',
+							strokeColor: '#CC66CC'
+						});
+						polygons.push(polygon);
+					}
+					map.setFitView();//地图自适应
+				}
+			});
+		});
+	</script>
+</body>
+</html>
